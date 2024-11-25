@@ -1,0 +1,14 @@
+$TTL 604800
+@   IN  SOA meudominio.local. root.meudominio.local. (
+        2023112501 ; Serial
+        604800     ; Refresh
+        86400      ; Retry
+        2419200    ; Expire
+        604800 )   ; Negative Cache TTL
+
+; Nameservers
+    IN  NS  ns1.meudominio.local.
+
+; A records
+ns1 IN  A   10.0.0.4
+www IN  A   10.0.0.4
