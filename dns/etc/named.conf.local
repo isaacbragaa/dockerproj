@@ -1,1 +1,19 @@
+zone "ifrn.asa.br" { // Change to desired zone
+	type master;
+	file "/etc/bind/db.ifrn.asa.br";	// Change to zone file path
+	allow-transfer {0.0.0.0; };		// Change to Secondary DNS IP
+};
 
+zone "diaren.ifrn.asa.br" { // Change to desired zone
+	type master;
+	file "/etc/bind/db.diaren.ifrn.asa.br";	// Change to zone file path
+	allow-transfer {0.0.0.0; };		// Change to Secondary DNS IP
+};
+
+//EX de CONF do slave, caso fosse transferir a zona diaren
+
+//zone "diaren.ifrn.asa.br" {
+//    type slave;
+//    masters { IP DO NS MASTER; };
+//    file "/etc/bind/db.diaren.ifrn.asa.br";
+//};
