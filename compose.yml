@@ -1,0 +1,160 @@
+version: '3.1'
+
+services:
+
+  wordpres:
+    build:
+      context: ./wordpress_containers
+      dockerfile: Dockerfile.wordpres
+    container_name: wordpres
+    hostname: wordpres
+    image: wordpres
+    restart: always
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - ./wordpress_containers/arquivos-wordpress/wordpress:/var/www/html
+    networks:
+       - asa-network-final
+
+  wordpress:
+    build:
+      context: ./wordpress_containers
+      dockerfile: Dockerfile.wordpres
+    container_name: wordpress
+    hostname: wordpress
+    image: wordpres
+    restart: always
+    depends_on:
+      - db2
+    environment:
+      WORDPRESS_DB_HOST: db2
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - ./wordpress_containers/arquivos-wordpress/wordpress2:/var/www/html
+    networks:
+       - asa-network-final
+    
+  db:
+    build:
+      context: ./wordpress_containers
+      dockerfile: Dockerfile.db
+    container_name: db
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./wordpress_containers/bds/db:/var/lib/mysql
+    networks:
+       - asa-network-final
+
+  db2:
+    build:
+      context: ./wordpress_containers
+      dockerfile: Dockerfile.db
+    container_name: db2
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./wordpress_containers/bds/db2/:/var/lib/mysql
+    networks:
+       - asa-network-final
+
+  bind:
+    build:
+      context: ./dns
+      dockerfile: Dockerfile.bind
+    image: bind
+    container_name: bind
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 953:953/tcp
+    networks:
+      - asa-network-final
+
+  proxy:
+    build:
+      context: ./nginx-proxy
+      dockerfile: Dockerfile.proxy
+    image: proxy
+    restart: always
+    container_name: proxy
+    ports:
+      - '80:80'
+      - '443:443'
+    depends_on:
+     - wordpress
+     - wordpres
+     - webmail
+    networks:
+       - asa-network-final
+
+  mail:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile.mail
+    image: mail
+    container_name: mail
+    hostname: mail.ifrn.asa
+    restart: always
+    depends_on:
+    - bind
+    ports:
+    - "25:25/tcp"
+    - "100:100/tcp"
+    - "143:143/tcp"
+    - "587:587/tcp"
+    - "993:993/tcp"
+    - "995:995/tcp"
+    networks:
+      - asa-network-final
+  
+  webmail:
+      build:
+        context: ./rainloop
+        dockerfile: Dockerfile.loop
+      image: webmail
+      container_name: webmail
+      hostname: webmail
+      restart: always
+      depends_on:
+      - mail
+      volumes:
+        - ./rainloop/rainloop-latest:/var/www/html/rainloop
+      networks:
+      - asa-network-final
+
+  ssh:
+    build: 
+      context: ./ssh
+      dockerfile: Dockerfile.ssh
+    image: ssh
+    container_name: ssh
+    ports:
+     - '22:22'
+    networks:
+     - asa-network-final
+
+
+#Docker Networks
+networks:
+  asa-network-final:
+    driver: bridge
+
