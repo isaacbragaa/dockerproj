@@ -6,8 +6,8 @@ RUN apt upgrade -y
 
 RUN apt install openssh-server openssh-client -y
 
-RUN useradd -m richard
+RUN useradd -m ibraga
 
-RUN echo 'richard:123456' | chpasswd
+RUN echo 'ibraga:123456' | chpasswd
 
 CMD ["service", "ssh", "start", "-D"]
