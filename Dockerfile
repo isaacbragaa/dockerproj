@@ -1,18 +1,11 @@
-FROM python:3.9
-
-
-WORKDIR /app
-
-
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
-
-
-COPY containers /app/
-
+FROM python:3.8-slim
 
 ARG APP_DIR
-WORKDIR /app/${APP_DIR}
+WORKDIR /app
 
+COPY containers/${APP_DIR}/requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY containers/${APP_DIR} /app
 
 CMD ["python", "app.py"]
