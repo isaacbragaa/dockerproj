@@ -2,8 +2,8 @@ from flask import Flask, render_template, request
 import sqlite3
 app = Flask(__name__)
 
+# Atualize o caminho do banco de dados
 DATABASE = '/app/db/database.sqlite'
-
 
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
